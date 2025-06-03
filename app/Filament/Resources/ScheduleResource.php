@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Rmsramos\Activitylog\Actions\ActivityLogTimelineTableAction;
 
 class ScheduleResource extends Resource
 {
@@ -21,6 +22,8 @@ class ScheduleResource extends Resource
     protected static ?string $navigationLabel = 'Programación de Clases';
     protected static ?string $pluralModelLabel = 'Programaciones de Clases';
     protected static ?string $modelLabel = 'Programación de Clase';
+
+
 
     public static function form(Form $form): Form
     {
@@ -37,6 +40,7 @@ class ScheduleResource extends Resource
                             ->searchable()
                             ->preload(10)
                             ->required()
+                            ->hidden(fn () => auth()->user()->hasRole('tutor'))
                             ->helperText('Selecciona el tutor asignado para esta clase.'),
 
                         Forms\Components\Grid::make(2)
@@ -90,6 +94,17 @@ class ScheduleResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                ActivityLogTimelineTableAction::make('Activities')
+                    ->withRelations(['profile', 'address'])
+                    ->timelineIcons([
+                        'created' => 'heroicon-m-check-badge',
+                        'updated' => 'heroicon-m-pencil-square',
+                    ])
+                    ->timelineIconColors([
+                        'created' => 'info',
+                        'updated' => 'warning',
+                    ])
+                    ->limit(10),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -109,7 +124,7 @@ class ScheduleResource extends Resource
     {
         return [
             'index' => Pages\ListSchedules::route('/'),
-            #'create' => Pages\CreateSchedule::route('/create'),
+            'create' => Pages\CreateSchedule::route('/create'),
             #'edit' => Pages\EditSchedule::route('/{record}/edit'),
         ];
     }
