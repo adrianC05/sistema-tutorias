@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: sistema_postgres_dev
+    restart: unless-stopped
+    env_file:
+      - .env 
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - laravel_net
+
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/development/Dockerfile
+    image: laravel-filament-app:latest
+    container_name: sistema_app_dev
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html  # Código fuente sincronizado en /var/www/html
+      - laravel-storage:/var/www/html/storage  # Persistencia del storage
+      - /var/www/html/vendor
+      - /var/www/html/node_modules
+      - public_data:/var/www/html/public
+    env_file:
+      - .env
+    networks:
+      - laravel_net
+    depends_on:
+      - db
+
+  web:
+    image: nginx:alpine
+    container_name: sistema_web_dev
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html  # Código fuente sincronizado en /var/www/html
+      - ./docker/development/nginx.conf:/etc/nginx/conf.d/default.conf
+      - laravel-storage:/var/www/html/storage
+      - public_data:/var/www/html/public # Acceso solo lectura para web
+    networks:
+      - laravel_net
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    depends_on:
+      app:
+        condition: service_started
+
+networks:
+  laravel_net:
+    driver: bridge
+
+volumes:
+  db_data:
+  laravel-storage:
+  public_data:
