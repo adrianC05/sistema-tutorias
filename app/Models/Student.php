@@ -16,4 +16,17 @@ class Student extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Un estudiante puede tener muchas solicitudes
+    public function student()
+    {
+        return $this->hasMany(Application::class);
+    }
+
+    public function getFullNameAttribute()
+    {
+        return $this->user
+            ? $this->user->name . ' ' . $this->user->last_name
+            : '(Sin usuario)';
+    }
 }

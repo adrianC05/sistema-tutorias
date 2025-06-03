@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
+
 class ScheduleResource extends Resource
 {
     protected static ?string $model = Schedule::class;
@@ -21,6 +22,8 @@ class ScheduleResource extends Resource
     protected static ?string $navigationLabel = 'Programación de Clases';
     protected static ?string $pluralModelLabel = 'Programaciones de Clases';
     protected static ?string $modelLabel = 'Programación de Clase';
+
+
 
     public static function form(Form $form): Form
     {
@@ -37,6 +40,7 @@ class ScheduleResource extends Resource
                             ->searchable()
                             ->preload(10)
                             ->required()
+                            ->hidden(fn () => auth()->user()->hasRole('tutor'))
                             ->helperText('Selecciona el tutor asignado para esta clase.'),
 
                         Forms\Components\Grid::make(2)
@@ -109,7 +113,7 @@ class ScheduleResource extends Resource
     {
         return [
             'index' => Pages\ListSchedules::route('/'),
-            #'create' => Pages\CreateSchedule::route('/create'),
+            'create' => Pages\CreateSchedule::route('/create'),
             #'edit' => Pages\EditSchedule::route('/{record}/edit'),
         ];
     }

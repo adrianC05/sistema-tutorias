@@ -17,4 +17,9 @@ class Schedule extends Model
         return $this->belongsTo(Tutor::class);
     }
 
+    // Un horario puede tener muchas solicitudes
+    public function students()
+    {
+        return $this->hasMany(Application::class);
+    }
 }
