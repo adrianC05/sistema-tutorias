@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Application extends Model
 {
     /** @use HasFactory<\Database\Factories\ApplicationFactory> */
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $fillable = ['student_id', 'schedule_id', 'subject', 'status', 'reason', 'application_date'];
 
@@ -27,5 +29,11 @@ class Application extends Model
     public function feedback()
     {
         return $this->hasOne(Feedback::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+        ->logOnly(['name', 'text']);
     }
 }

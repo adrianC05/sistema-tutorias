@@ -10,7 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-
+use Rmsramos\Activitylog\Actions\ActivityLogTimelineTableAction;
 
 class ScheduleResource extends Resource
 {
@@ -94,6 +94,17 @@ class ScheduleResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                ActivityLogTimelineTableAction::make('Activities')
+                    ->withRelations(['profile', 'address'])
+                    ->timelineIcons([
+                        'created' => 'heroicon-m-check-badge',
+                        'updated' => 'heroicon-m-pencil-square',
+                    ])
+                    ->timelineIconColors([
+                        'created' => 'info',
+                        'updated' => 'warning',
+                    ])
+                    ->limit(10),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

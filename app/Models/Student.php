@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 class Student extends Model
 {
     /** @use HasFactory<\Database\Factories\StudentFactory> */
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $fillable = ['user_id', 'carrier'];
     // Un usuario puede tener muchos estudiantes
@@ -28,5 +29,11 @@ class Student extends Model
         return $this->user
             ? $this->user->name . ' ' . $this->user->last_name
             : '(Sin usuario)';
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+        ->logOnly(['name', 'text']);
     }
 }
